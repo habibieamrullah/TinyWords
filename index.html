@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title>Tiny Words - HTML Writer</title>
+		<meta http-equiv="Content-Security-Policy" content="script-src 'self' 'unsafe-inline';" />
+		
+		<link rel="stylesheet" type="text/css" href="css/font-awesome.css">
+		
+		
+		
+		<!-- Insert this line above script imports  -->
+		<script>if (typeof module === 'object') {window.module = module; module = undefined;}</script>
+		
+		<script src="jquery.js"></script>
+		<script src="tinymce/tinymce.min.js"></script>
+		
+		<script>if (window.module) module = window.module;</script>
+		<!-- End your script imports before above line -->
+		
+		
+		
+		<style>
+			
+			.mce-tinymce, .mce-container-body, #code_ifr {
+				min-height: 100% !important;
+			}
+			/*Container body*/
+			.mce-container-body {
+				position: absolute;
+				bottom: 0;
+				left: 0;
+				right: 0;
+			}
+			
+			.mce-container-body .mce-edit-area {
+				position: absolute;
+				top: 69px;
+				bottom: 37px;
+				left: 0;
+				right: 0;
+			}
+			
+			.mce-tinymce .mce-statusbar {
+				position: absolute;
+				bottom: 0;
+				left: 0;
+				right: 0;
+			}
+			
+			body{
+				padding: 0px;
+				margin: 0px;
+				position: fixed;
+				top: 0;
+				left: 0;
+				right: 0; 
+				bottom: 0;
+			}
+			
+		</style>
+		
+	</head>
+	
+	<body>
+		
+		<textarea id="maineditor" style="display: block; box-sizing: border-box; width: 100%; height: 100%;"></textarea>
+		
+		<script>
+			const { dialog, BrowserWindow } = require('electron').remote;
+			const { ipcRenderer } = require('electron');
+			const fs = require('fs');
+		</script>
+		
+		<script>
+			
+			
+			tinymce.init({ 
+				selector : 'textarea' , 
+				plugins : 'directionality, code', 
+				toolbar: "ltr rtl | alignleft aligncenter alignright alignjustify | outdent indent | sizeselect | bold italic | fontselect |  fontsizeselect", 
+				relative_urls: false, 
+				remove_script_host : true, 
+				statusbar: false,
+				menu: {
+					file: { title: 'File', items: 'newdocument opendocument savedocument' },
+					edit: { title: 'Edit', items: 'undo redo | cut copy paste | selectall | searchreplace' },
+					view: { title: 'View', items: 'code | visualaid visualchars visualblocks | spellchecker | preview fullscreen' },
+					insert: { title: 'Insert', items: 'image link media template codesample inserttable | charmap emoticons hr | pagebreak nonbreaking anchor toc | insertdatetime' },
+					format: { title: 'Format', items: 'bold italic underline strikethrough superscript subscript codeformat | formats blockformats fontformats fontsizes align lineheight | forecolor backcolor | removeformat' },
+					tools: { title: 'Tools', items: 'spellchecker spellcheckerlanguage | code wordcount' },
+					table: { title: 'Table', items: 'inserttable | cell row column | tableprops deletetable' },
+					help: { title: 'Help', items: 'help' },
+				},
+				setup: function (editor) {
+					
+					editor.addMenuItem('opendocument', {
+						text: 'Open',
+						icon: 'plus',
+						onclick: function(){
+							dialog.showOpenDialog({
+								properties: ['openFile']
+							}).then(result => {
+								
+								if(!result.canceled){
+									var newprojectdir = result.filePaths[0];
+									
+									if(newprojectdir != undefined){
+										fs.readFile(newprojectdir, 'utf8', function (err, data) {
+											if (err) {
+												return console.log(err);
+											}
+											tinymce.get("maineditor").setContent(data);
+										});
+										
+									}
+								}
+							});
+						},
+					});
+					
+					editor.addMenuItem('savedocument', {
+						text: 'Save As',
+						icon: 'save',
+						onclick: function(){
+						
+							saveDocument();
+						
+							
+						
+						},
+					});
+				},
+			});
+			
+			function saveDocument(){
+				dialog.showSaveDialog({
+					properties: ['showOverwriteConfirmation'],
+					filters: [{'name' : 'HTML Files', extensions : ['html'] }],
+				}).then(result => {
+					if(!result.canceled){
+						var newprojectdir = result.filePath;
+						
+						if(newprojectdir != undefined){
+							var contentTosave = tinymce.get("maineditor").getContent();
+							fs.appendFile(newprojectdir, contentTosave, function (err) {
+								if (err) throw err;
+								console.log('Saved!');
+							});
+							
+						}
+					}
+				});
+			}
+			
+		</script>
+	
+	</body>
+</html>
