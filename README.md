@@ -9,4 +9,6 @@ So it is a text editor based on the popular TinyMCE and because I made it as Des
 
 You can download this program from my GoogleDrive link: https://drive.google.com/file/d/1YMPukwP4LgGrLtftO-edBOVBSbJbmH5X/view?usp=sharing
 
+Watch the demo video about how it works: https://www.youtube.com/watch?v=vvWP0V6OWvA
+
 Extract the content and find the executable file in it.
